@@ -28,7 +28,7 @@ Projectrouter.get("/projectsByUser/:userId", async (req, res) => {
           path: 'tasks',
           model: 'Task' // Replace 'Task' with the actual model name for tasks
         }
-      }).exec();;
+      }).exec();
       res.json(projects);
   } catch (error) {
       console.error('Error fetching projects:', error.message);
@@ -40,7 +40,13 @@ Projectrouter.get("/projectsByUser/:userId", async (req, res) => {
 
 Projectrouter.get('/projects', async (req, res) => {
   try {
-    const projects = await ProjectModel.find().populate('client');
+    const projects = await ProjectModel.find().populate('client').populate('sprints').populate({
+      path: 'sprints',
+      populate: {
+        path: 'tasks',
+        model: 'Task' // Replace 'Task' with the actual model name for tasks
+      }
+    }).exec();
     res.json(projects);
   } catch (error) {
     res.status(500).json({ 'err': error });
@@ -89,7 +95,6 @@ Projectrouter.post("/addSprint/:projectId", async (req, res) => {
 });
 
 
-// Route to add a new task to a specific sprint
 Projectrouter.post("/addTask/:sprintId", async (req, res) => {
   try {
       const { title, status, priority, type, role, githubLink, description, taskDate } = req.body;
@@ -152,6 +157,71 @@ Projectrouter.get('/taskStatusSummary', async (req, res) => {
   //   res.status(500).json({ error: 'Internal Server Error' });
   // }
 })
+
+
+Projectrouter.put('/updateSprintStatus/:sprintId', async (req, res) => {
+  try {
+    const { sprintId } = req.params;
+    const { active } = req.body;
+    if (!sprintId || active === undefined) {
+      return res.status(400).json({ error: 'Invalid input' });
+    }
+    const updatedSprint = await SprintModel.findByIdAndUpdate(
+      sprintId,
+      { $set: { 'status.active': active } },
+      { new: true }
+    );
+
+    if (!updatedSprint) {
+      return res.status(404).json({ error: 'Sprint not found' });
+    }
+
+    res.json(updatedSprint);
+  } catch (error) {
+    console.error('Error updating sprint status:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+Projectrouter.put('/updateTaskStatus/:taskId', async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { status } = req.body;
+    const updatedTask = await TaskModel.findByIdAndUpdate(
+      taskId,
+      { $set: { status } },
+      { new: true }
+    );
+    if (!updatedTask) {
+      return res.status(404).json({ error: 'Task not found.' });
+    }
+    res.json(updatedTask);
+  } catch (error) {
+    console.error('Error updating task status:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+Projectrouter.put('/updateTaskPriority/:taskId', async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { priority } = req.body;
+    const updatedTask = await TaskModel.findByIdAndUpdate(
+      taskId,
+      { $set: { priority } },
+      { new: true }
+    );
+    if (!updatedTask) {
+      return res.status(404).json({ error: 'Task not found.' });
+    }
+    res.json(updatedTask);
+  } catch (error) {
+    console.error('Error updating task priority:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 module.exports = 
 {
