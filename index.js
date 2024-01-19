@@ -5,6 +5,7 @@ const {connection } =require("./config/db")
 const {UserRouter} = require('./routes/UserRoutes')
 const {Projectrouter}= require('./routes/ProjectRoutes')
 const {ContactRouter}= require('./routes/ContactRoutes')
+const { TeamRouter } = require('./routes/TeamRoutes')
 const app = express()
 
 
@@ -20,6 +21,7 @@ app.get("/",(req,res)=>{
 app.use("/user",UserRouter)
 app.use('/project',Projectrouter)
 app.use('/contact',ContactRouter)
+app.use('/team',TeamRouter)
 
 
 app.listen(2148,async()=>{

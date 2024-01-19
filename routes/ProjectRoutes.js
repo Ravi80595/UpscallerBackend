@@ -26,7 +26,11 @@ Projectrouter.get("/projectsByUser/:userId", async (req, res) => {
         path: 'sprints',
         populate: {
           path: 'tasks',
-          model: 'Task' // Replace 'Task' with the actual model name for tasks
+          model: 'Task', // Replace 'Task' with the actual model name for tasks
+          populate: {
+            path: 'assignedTo',
+            model: 'TeamMember' // Replace 'TeamMember' with the actual model name for team members
+          }
         }
       }).exec();
       res.json(projects);
@@ -43,8 +47,12 @@ Projectrouter.get('/projects', async (req, res) => {
     const projects = await ProjectModel.find().populate('client').populate('sprints').populate({
       path: 'sprints',
       populate: {
-        path: 'tasks',
-        model: 'Task' // Replace 'Task' with the actual model name for tasks
+        path: 'task',
+        model: 'Task',
+        populate: {
+          path: 'assignedTo',
+          model: 'TeamMember' // Replace 'TeamMember' with the actual model name for team members
+        }
       }
     }).exec();
     res.json(projects);
@@ -74,7 +82,7 @@ Projectrouter.post("/createProject", async (req, res) => {
 Projectrouter.post("/addSprint/:projectId", async (req, res) => {
   try {
       const { title, goal, timeline, startDate, endDate } = req.body;
-      console.log(req.body)
+      // console.log(req.body)
       const { projectId } = req.params;
       const newSprint = await SprintModel.create({
           title,
@@ -97,7 +105,7 @@ Projectrouter.post("/addSprint/:projectId", async (req, res) => {
 
 Projectrouter.post("/addTask/:sprintId", async (req, res) => {
   try {
-      const { title, status, priority, type, role, githubLink, description, taskDate } = req.body;
+      const { title, status, priority, type, role, githubLink, description, taskDate,assignedTo } = req.body;
       const { sprintId } = req.params;
         // console.log(sprintId,req.body)
       const newTask = await TaskModel.create({
@@ -109,6 +117,7 @@ Projectrouter.post("/addTask/:sprintId", async (req, res) => {
           githubLink,
           description,
           taskDate,
+          assignedTo
       });
       // const sprints =await SprintModel.findById(sprintId)
       const sprint = await SprintModel.findByIdAndUpdate(

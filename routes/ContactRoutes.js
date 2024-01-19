@@ -1,5 +1,6 @@
 const express = require("express");
 const { ContactModel } = require("../Models/ContactModel");
+const { MailModel } = require("../Models/MailModel");
 const ContactRouter = express.Router();
 
 
@@ -22,6 +23,35 @@ ContactRouter.post("/submit", async (req, res) => {
 });
 
 
+ContactRouter.post("/mail/submit", async (req, res) => {
+    try {
+        const { email} = req.body;
+        const newContactForm = new MailModel({
+            email,
+        });
+        const savedForm = await newContactForm.save();
+        res.status(201).json({ success: true, message: "Form submitted successfully", data: savedForm });
+    } catch (error) {
+        console.error("Error submitting form:", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+});
+
+
+
+ContactRouter.get("/mail/submissions", async (req, res) => {
+    try {
+        const allSubmissions = await MailModel.find();
+        res.status(200).json({ success: true, data: allSubmissions });
+    } catch (error) {
+        console.error("Error retrieving submissions:", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+});
+
+
+
+
 ContactRouter.get("/submissions", async (req, res) => {
     try {
         const allSubmissions = await ContactModel.find();
@@ -41,6 +71,22 @@ ContactRouter.delete("/delete/:id", async (req, res) => {
             return res.status(404).json({ success: false, message: "Submission not found" });
         }
         await ContactModel.deleteOne({ _id: submissionId });
+        res.status(200).json({ success: true, message: "Submission deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting submission:", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+});
+
+
+ContactRouter.delete("/mail/delete/:id", async (req, res) => {
+    try {
+        const submissionId = req.params.id;
+        const existingSubmission = await MailModel.findById(submissionId);
+        if (!existingSubmission) {
+            return res.status(404).json({ success: false, message: "Submission not found" });
+        }
+        await MailModel.deleteOne({ _id: submissionId });
         res.status(200).json({ success: true, message: "Submission deleted successfully" });
     } catch (error) {
         console.error("Error deleting submission:", error);
