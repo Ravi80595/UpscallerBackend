@@ -28,9 +28,12 @@ const teamMemberSchema = new mongoose.Schema({
       joiningDate: {
         type: Date,
       },
+      about:{
+        type:String,
+      }
     });
 
-const TeamMemberModel = mongoose.model("TeamMember", teamMemberSchema);
+const TeamMemberModel = mongoose.model("Team", teamMemberSchema);
 
 module.exports = {
   TeamMemberModel,

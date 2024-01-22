@@ -19,6 +19,31 @@ Projectrouter.get('/', authenticate, async (req, res) => {
   }
 });
 
+
+
+Projectrouter.get("/projectsUser",authenticate, async (req, res) => {
+      const userId = req.body.userID
+      console.log(userId,'id')
+  try {
+      // const { userId } = req.params;
+      const projects = await ProjectModel.find({ client: userId }).populate('client').populate('projectTeam').populate('sprints').populate({
+        path: 'sprints',
+        populate: {
+          path: 'tasks',
+          model: 'Task', // Replace 'Task' with the actual model name for tasks
+          populate: {
+            path: 'assignedTo',
+            model: 'teams' // Replace 'TeamMember' with the actual model name for team members
+          }
+        }
+      }).exec();
+      res.json(projects);
+  } catch (error) {
+      console.error('Error fetching projects:', error.message);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+})
+
 Projectrouter.get("/projectsByUser/:userId", async (req, res) => {
   try {
       const { userId } = req.params;
@@ -29,7 +54,7 @@ Projectrouter.get("/projectsByUser/:userId", async (req, res) => {
           model: 'Task', // Replace 'Task' with the actual model name for tasks
           populate: {
             path: 'assignedTo',
-            model: 'TeamMember' // Replace 'TeamMember' with the actual model name for team members
+            model: 'teams' // Replace 'TeamMember' with the actual model name for team members
           }
         }
       }).exec();
@@ -51,7 +76,7 @@ Projectrouter.get('/projects', async (req, res) => {
         model: 'Task',
         populate: {
           path: 'assignedTo',
-          model: 'TeamMember' // Replace 'TeamMember' with the actual model name for team members
+          model: 'Teams' // Replace 'TeamMember' with the actual model name for team members
         }
       }
     }).exec();
@@ -65,11 +90,11 @@ Projectrouter.get('/projects', async (req, res) => {
 
 Projectrouter.post("/createProject", async (req, res) => {
   try {
-    console.log('created',req.body)
-      const { title, client } = req.body;
+    // console.log('created',req.body)
+      const { title, client,github,repoName,projectTeam,projectDesc,projectDetailsDesc} = req.body;
       // const user = new UserModel({email,password:hash,name,brandName})
         // await user.save()
-      const newProject = new ProjectModel({ title, client});
+      const newProject = new ProjectModel({ title, client,github,repoName,projectTeam,projectDesc,projectDetailsDesc});
       await newProject.save()
       res.send({"msg":"project saved"});
   } catch (error) {

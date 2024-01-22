@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const taskSchema = new mongoose.Schema({
     title: String,
-    assignedTo: [{ type: mongoose.Schema.Types.ObjectId, ref: 'TeamMember' }], 
+    assignedTo: [{ type: mongoose.Schema.Types.ObjectId, ref: 'teams' }], 
     status: {
         type: String,
         enum: ['todo', 'inprogress', 'done'],

@@ -7,7 +7,7 @@ const { TeamMemberModel } = require("../Models/TeamMemberModel");
 
 TeamRouter.post("/create", async (req, res) => {
     try {
-      const { name, role, email, phoneNumber, age, address, joiningDate } = req.body;
+      const { name, role, email, phoneNumber, age, address, joiningDate,about } = req.body;
       const newTeamMember = new TeamMemberModel({
         name,
         role,
@@ -16,6 +16,7 @@ TeamRouter.post("/create", async (req, res) => {
         age,
         address,
         joiningDate,
+        about
       });
       const savedTeamMember = await newTeamMember.save();
       res.status(201).json({ message: "Team member created successfully", teamMember: savedTeamMember });
