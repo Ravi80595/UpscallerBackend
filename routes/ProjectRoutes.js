@@ -26,14 +26,14 @@ Projectrouter.get("/projectsUser",authenticate, async (req, res) => {
       console.log(userId,'id')
   try {
       // const { userId } = req.params;
-      const projects = await ProjectModel.find({ client: userId }).populate('client').populate('projectTeam').populate('sprints').populate({
+      const projects = await ProjectModel.find({ client: userId }).populate('client').populate('sprints').populate({
         path: 'sprints',
         populate: {
           path: 'tasks',
           model: 'Task', // Replace 'Task' with the actual model name for tasks
           populate: {
             path: 'assignedTo',
-            model: 'teams' // Replace 'TeamMember' with the actual model name for team members
+            model: 'Team' // Replace 'TeamMember' with the actual model name for team members
           }
         }
       }).exec();
