@@ -11,6 +11,8 @@ const projectSchema = mongoose.Schema({
     projectDetailsDesc:String,
     github:String,
     repoName:String,
+    projectCost:String,
+    projectTimeline:String,
     // projectTeam:[{type:mongoose.Schema.Types.ObjectId, ref: 'Team'}],
     projectTeam: [{ type: mongoose.Schema.Types.ObjectId, ref: "Team" }],
     sprints: [{type:mongoose.Schema.Types.ObjectId, ref: 'Sprint' }],

@@ -6,6 +6,11 @@ const {UserRouter} = require('./routes/UserRoutes')
 const {Projectrouter}= require('./routes/ProjectRoutes')
 const {ContactRouter}= require('./routes/ContactRoutes')
 const { TeamRouter } = require('./routes/TeamRoutes')
+const { GoalRouter } = require('./routes/GoalRoutes')
+const { Ticketrouter } = require('./routes/TicketRoutes')
+const {PaymentRouter} = require('./routes/PaymentRoutes')
+
+
 const app = express()
 
 
@@ -22,7 +27,9 @@ app.use("/user",UserRouter)
 app.use('/project',Projectrouter)
 app.use('/contact',ContactRouter)
 app.use('/team',TeamRouter)
-
+app.use('/goal',GoalRouter)
+app.use('/ticket',Ticketrouter)
+app.use('/payment',PaymentRouter)
 
 app.listen(2148,async()=>{
     try{

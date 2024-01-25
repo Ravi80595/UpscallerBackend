@@ -54,7 +54,7 @@ Projectrouter.get("/projectsByUser/:userId", async (req, res) => {
           model: 'Task', // Replace 'Task' with the actual model name for tasks
           populate: {
             path: 'assignedTo',
-            model: 'teams' // Replace 'TeamMember' with the actual model name for team members
+            model: 'Team' // Replace 'TeamMember' with the actual model name for team members
           }
         }
       }).exec();
@@ -72,11 +72,11 @@ Projectrouter.get('/projects', async (req, res) => {
     const projects = await ProjectModel.find().populate('client').populate('sprints').populate({
       path: 'sprints',
       populate: {
-        path: 'task',
+        path: 'tasks',
         model: 'Task',
         populate: {
           path: 'assignedTo',
-          model: 'Teams' // Replace 'TeamMember' with the actual model name for team members
+          model: 'Team' 
         }
       }
     }).exec();
@@ -99,6 +99,37 @@ Projectrouter.post("/createProject", async (req, res) => {
       res.send({"msg":"project saved"});
   } catch (error) {
       res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+// PUT route to update project details
+Projectrouter.put('/updateProject/:projectId', async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const updateFields = req.body;
+    // Validate if projectId is provided
+    if (!projectId) {
+      return res.status(400).json({ error: 'Invalid input: ProjectId is required' });
+    }
+
+    // Find and update the project
+    const updatedProject = await ProjectModel.findByIdAndUpdate(
+      projectId,
+      { $set: updateFields },
+      { new: true }
+    );
+
+    // Check if the project was found and updated
+    if (!updatedProject) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+
+    // Respond with the updated project
+    res.json(updatedProject);
+  } catch (error) {
+    console.error('Error updating project details:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
